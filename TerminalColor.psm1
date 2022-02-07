@@ -1,3 +1,14 @@
+<#
+  STYLE     SEQ      RESET
+  Bold      `e[1m - `e[22m
+  Underline `e[4  - `e[24m
+  Inverted  `e[7m - `e[27m
+  ResetAll        - `e[0m
+  Ref:
+    https://duffney.io/usingansiescapesequencespowershell/
+    https://bradwilson.io/blog/prompt/powershell/
+#>
+
 class TerminalColor
 {
   hidden [int[]]$Black   = (0  ,0  ,0  )
@@ -17,9 +28,27 @@ class TerminalColor
   hidden [int[]]$Teal    = (0  ,128,128)
   hidden [int[]]$Navy    = (0  ,0  ,128)
 
-  hidden [int[]]$BaseScale16  = (0..15)
-  hidden [int[]]$ColorScale24 = (16..231)
-  hidden [int[]]$GrayScale24  = (232..255)
+  [hashtable]$Colors = @{
+    'Black'   = (0  ,0  ,0  )
+    'White'   = (255,255,255)
+    'Red'     = (255,0  ,0  )
+    'Lime'    = (0  ,255,0  )
+    'Blue'    = (0  ,0  ,255)
+    'Yellow'  = (255,255,0  )
+    'Cyan'    = (0  ,255,255)
+    'Magenta' = (255,0  ,255)
+    'Silver'  = (192,192,192)
+    'Gray'    = (128,128,128)
+    'Maroon'  = (128,0  ,0  )
+    'Olive'   = (128,128,0  )
+    'Green'   = (0  ,128,0  )
+    'Purple'  = (128,0  ,128)
+    'Teal'    = (0  ,128,128)
+    'Navy'    = (0  ,0  ,128)
+  }
+  [int[]]$BaseScale16  = (0..15)
+  [int[]]$ColorScale24 = (16..231)
+  [int[]]$GraysScale24 = (232..255)
    
 
   TerminalColor() { }
@@ -64,7 +93,6 @@ class TerminalColor
     [console]::write("`e[38;5;$($color)m$($inputObject)`e[0m")
   }
 
-  #CenterString by length.
   [string] CenterString([string]$string, [int]$length)
   {
     return $string.padLeft([math]::round($length / 2 + [math]::round($string.Length / 2)))
