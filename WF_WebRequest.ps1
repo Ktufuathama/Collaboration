@@ -62,5 +62,6 @@ class WF_WebRequest
       $this.close()
     }
     [system.runtime.interopservices.marshal]::releaseComObject($this.Html)
+    $this.Html = $null
   }
 }
