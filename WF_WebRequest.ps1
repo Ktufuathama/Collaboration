@@ -18,9 +18,9 @@ class WF_WebRequest
   [string]GetWebResponse([string]$uri)
   {
     $this.create($uri)
-    Write-Host $this.connect()
     [void]$this.read()
-    $this.close()
+    [void]$this.write()
+    [void]$this.close()
     return $this.ResponseString
   }
 
@@ -40,20 +40,31 @@ class WF_WebRequest
 
   [string] Read()
   {
-    $this.Html = New-Object -com 'HtmlFile'
     $this.DataStream = $this.Response.getResponseStream()
     $this.Reader = [streamreader]::new($this.DataStream)
     $this.ResponseString = $this.Reader.readToEnd()
-    $this.Html.write([ref]$this.ResponseString)
     return $this.ResponseString
   }
 
-  [void] Close()
+  [object] Write()
   {
-    $this.Reader.close()
-    $this.DataStream.close()
-    $this.Response.close()
-    $this.IsClosed = $true    
+    $this.Html = New-Object -com 'HtmlFile'
+    $this.Html.write([ref]$this.ResponseString)
+    return $this.Html
+  }
+
+  [bool] Close()
+  {
+    try {
+      $this.Reader.close()
+      $this.DataStream.close()
+      $this.Response.close()
+      $this.IsClosed = $true
+      return $true
+    }
+    catch {
+      return $false
+    }
   }
 
   [void] Dispose()
