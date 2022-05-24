@@ -18,6 +18,7 @@ class WF_WebRequest
   [string]GetWebResponse([string]$uri)
   {
     $this.create($uri)
+    [void]$this.connect()
     [void]$this.read()
     [void]$this.write()
     [void]$this.close()
