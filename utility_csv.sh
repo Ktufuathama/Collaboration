@@ -1,6 +1,7 @@
 #! /bin/bash
 #
-#
+# WARNING!!!
+#		CSV Alphanumeric Only! Not configured to handle quotes or special characters.
 #
 
 . ~/terminalcolor.sh
@@ -32,6 +33,7 @@ outCsv()
 	return 0
 }
 
+
 writeCsv()
 {
 	printf "\t${arrFields}\n"
@@ -48,28 +50,52 @@ update()
 {
 	#GetCsv
 	inCsv $1
-	curDate=$(date '+%H%m')
+	curDate=$(date '+%H%M')
 
 	echo "DBG: 0"
 	writeCsv
 	
 	for i in "${arrTable[@]}"; do
 		echo "${i}"
-		while IFS="," read -ra item; do
-			if [ $item -ge $((curDate - 30)) && $item -le $((curDate + 30))]; then
-				echo "Match ${$item}| = $(date '+%H%M')"
-			else
-				echo "NoMatch ${$item} = $(date '+%H%M')"
-			fi
-			
-			echo ">> ${item}"
-		done <<< ${i}
+		if [ $item -ge $((curDate - 30)) ] && [ $item -le $((curDate + 30)) ]; then
+			echo "Match ${curDate}"
+		else
+			echo "NoMatch ${curDate}"
+		fi
+		echo ">> ${item}"
 	done
 
 	echo "DBG: 1"
 	writeCsv
 	
 	return 0
+}
+
+# param
+#		1: FilePath;
+#		2: CurTimeToTest;
+update2()
+{
+	inCsv $1
+	if [ ! -z $2 ]; then
+		curTime=$2
+	else
+		curTime=$(date '+%H%M')
+	fi
+	for i in "${arrTable[@]}"; do
+		time=$(splitArr $i 0)
+
+		echo $((${curTime#0} - 30))
+		echo $((${curTime#0} + 30))
+		
+		#Get Entry within 30 mins.
+		if [ $time -ge $((${curTime#0} - 30)) ] || [ $time -le $((${curTime#0} + 30)) ]; then
+			printf "Match\t${curTime}:${time}\n"
+		else
+			printf "NoMatch\t${curTime}:${time}\n"
+			continue
+		fi
+	done
 }
 
 mathTest()
@@ -83,15 +109,29 @@ mathTest()
 
 # param
 #		1: FilePath;
-genCsv()
+genCsvNew()
+{
+	printf "Time,HVol,TVol\n" > $1
+	for i in {1..24}; do
+		if [ ${#i} -eq 1 ]; then
+			printf "0${i}00,,\n" >> $1
+		else
+			printf "${i}00,,\n" >> $1
+		fi
+	done
+	return 0
+}
+
+# param
+#		1: FilePath;
+genCsvRnd()
 {
 	t=0
 	printf "Time,HVol,TVol\n" > $1
 	for i in {1..24}; do
 		r=${RANDOM}
 		t=$((t=t+r))
-		if [ ${#i} -eq 1 ]
-		then
+		if [ ${#i} -eq 1 ]; then
 			printf "0${i}00,${r},${t}\n" >> $1
 		else
 			printf "${i}00,${r},${t}\n" >> $1
