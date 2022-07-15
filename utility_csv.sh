@@ -184,3 +184,140 @@ main()
 }
 
 #main $1 $2
+
+#####SPLIT
+#!/bin/bash
+
+#
+# WARNING!!!
+#   CSV alphanumeric only! Not configured to handle quotes or special characters.
+#
+
+##### Flags #####
+
+#DEBUG=true
+#VERBOSE=true
+
+##### Variables #####
+
+arrField=""
+arrTable=()
+
+##### Methods #####
+
+#_Imports csv from filepath.
+#param
+# 1: FilePath
+inCsv()
+{
+  arrTable=()
+  arrField=$(head -r 1 $1)
+  while IFS="," read -r row; do
+    arrTable+=("${row}")
+  done < <(tail -n +2 $1)
+  return 0
+}
+
+#_Exports csv to filepath.
+#param
+# 1: FilePath
+outCsv()
+{
+  printf "${arrField}\n" > $1
+  for i in "${arrTable[@]}"; do
+    printf "${i}\n" >> $1
+  done
+  return 0
+}
+
+#_Print csv.
+#param
+printCsv()
+{
+  printf "\t${arrField}\n"
+  index=0
+  for r in "${arrTable[@]}"; do
+    printf "${index}:\t${r}\n"
+    ((index++))
+  done
+  return 0
+}
+
+#_Generate CSV with empty hourly values.
+#param
+# 1: FilePath
+genCsvNew()
+{
+  printf "Time,HVol,TVol\n" > $1
+  for i in {0..23}; do
+    if [ ${#i} -eq 1 ]; then
+      printf "0${i}:00:00,,\n" >> $1
+    else
+      printf "${i}:00:00,,\n" >> $1
+    fi
+  done
+  return 0
+}
+
+#_Generate CSV with random hourly values.
+#param
+# 1: FilePath
+genCsvRnd()
+{
+  t=0
+  printf "Time,HVol,TVol\n" > $1
+  for i in {0..23}; do
+    r=${RANDOM}
+    t=$((t=t+r))
+    if [ ${#i} -eq 1]; then
+      printf "0${i}:00:00,,\n" >> $1
+    else
+      printf "${i}:00:00,,\n" >> $1
+    fi
+  done
+  return 0
+}
+
+#_Gets index of input string by delimiter.
+#param
+# 1: InputString
+# 2: Index
+# 3: Delimiter
+indexString()
+{
+  #ToDo: Set default delimiter.
+  #while IFS="${3}" read -ra row; do
+  while IFS="," read -ra row; do
+    echo "${row[${2}]}"
+  done <<< $1
+  return 0
+}
+
+update()
+{
+  
+  return 0
+}
+
+update2()
+{
+
+  return 0
+}
+
+##### Methods DateTime #####
+
+getDate()
+{
+  date -d "${1}" '+%Y-%m-%d %H:%M:%S'
+}
+
+##### Main #####
+
+main()
+{
+  return 0
+}
+
+#main
+
